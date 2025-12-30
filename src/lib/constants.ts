@@ -38,3 +38,8 @@ export const PAGINATION = {
   MAX_PAGE_SIZE: 100,
   MIN_PAGE_SIZE: 1,
 } as const;
+
+export const YOUTUBE_LIMITS = {
+  /** Maximum number of video IDs per batch metadata request */
+  MAX_BATCH_SIZE: 50,
+} as const;
