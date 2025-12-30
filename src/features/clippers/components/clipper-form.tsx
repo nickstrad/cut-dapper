@@ -34,7 +34,7 @@ const formSchema = z.object({
   ),
 });
 
-type FormValues = z.infer<typeof formSchema>;
+export type FormValues = z.infer<typeof formSchema>;
 
 type ClipperFormProps = {
   clipper?: Clipper;

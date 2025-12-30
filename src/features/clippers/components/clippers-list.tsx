@@ -9,16 +9,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -29,13 +27,40 @@ import {
 import { Pencil, Trash2, Search } from "lucide-react";
 import Link from "next/link";
 import { PATH_BUILDERS } from "@/lib/constants";
-import { useState } from "react";
+import { useState, useEffect, useTransition } from "react";
+import { useDebounce } from "react-use";
 
 export const ClippersList = () => {
   const { data } = useSuspenseClippers();
   const { mutate: removeClipper, isPending } = useRemoveClipper();
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState<string | null>(null);
   const [params, setParams] = useClippersParams();
+  const [searchValue, setSearchValue] = useState(params.search);
+  const [isPendingTransition, startTransition] = useTransition();
+
+  // Debounce search value by 500ms
+  const [debouncedSearchValue, setDebouncedSearchValue] = useState(searchValue);
+
+  useDebounce(
+    () => {
+      setDebouncedSearchValue(searchValue);
+    },
+    500,
+    [searchValue]
+  );
+
+  // Update URL params when debounced value changes
+  useEffect(() => {
+    startTransition(() => {
+      setParams({ search: debouncedSearchValue, page: 1 });
+    });
+  }, [debouncedSearchValue, setParams, startTransition]);
+
+  // Sync local search value with URL params on mount/navigation
+  useEffect(() => {
+    setSearchValue(params.search);
+  }, [params.search]);
 
   const handleDelete = (id: string, name: string) => {
     setDeletingId(id);
@@ -44,13 +69,10 @@ export const ClippersList = () => {
       {
         onSettled: () => {
           setDeletingId(null);
+          setDeleteDialogOpen(null);
         },
       }
     );
-  };
-
-  const handleSearch = (value: string) => {
-    setParams({ search: value, page: 1 });
   };
 
   return (
@@ -61,8 +83,8 @@ export const ClippersList = () => {
           <Input
             type="search"
             placeholder="Search clippers..."
-            value={params.search}
-            onChange={(e) => handleSearch(e.target.value)}
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
             className="pl-9"
           />
         </div>
@@ -107,8 +129,13 @@ export const ClippersList = () => {
                         </Button>
                       </Link>
 
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
+                      <Dialog
+                        open={deleteDialogOpen === clipper.id}
+                        onOpenChange={(open) =>
+                          setDeleteDialogOpen(open ? clipper.id : null)
+                        }
+                      >
+                        <DialogTrigger asChild>
                           <Button
                             variant="ghost"
                             size="icon-sm"
@@ -116,29 +143,35 @@ export const ClippersList = () => {
                           >
                             <Trash2 className="size-4" />
                           </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Delete Clipper</AlertDialogTitle>
-                            <AlertDialogDescription>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Delete Clipper</DialogTitle>
+                            <DialogDescription>
                               Are you sure you want to delete &quot;
                               {clipper.name}
                               &quot;? This action cannot be undone.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
+                            </DialogDescription>
+                          </DialogHeader>
+                          <DialogFooter>
+                            <Button
+                              variant="outline"
+                              onClick={() => setDeleteDialogOpen(null)}
+                            >
+                              Cancel
+                            </Button>
+                            <Button
+                              variant="destructive"
                               onClick={() =>
                                 handleDelete(clipper.id, clipper.name)
                               }
-                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              disabled={isPending && deletingId === clipper.id}
                             >
                               Delete
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
+                            </Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
                     </div>
                   </TableCell>
                 </TableRow>
