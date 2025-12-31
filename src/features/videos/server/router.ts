@@ -1,5 +1,5 @@
 import { PAGINATION } from "@/lib/constants";
-import { baseProcedure, createTRPCRouter } from "@/trpc/init";
+import { baseProcedure, adminProcedure, createTRPCRouter } from "@/trpc/init";
 import prisma from "@/lib/db";
 import { YouTubeMetadataFetcher } from "@/lib/youtube-metadata";
 import z from "zod";
@@ -118,7 +118,7 @@ export const videosRouter = createTRPCRouter({
       return video;
     }),
 
-  create: baseProcedure
+  create: adminProcedure
     .input(videoInputSchema)
     .mutation(async ({ input }) => {
       const { clipperIds, ...videoData } = input;
@@ -155,7 +155,7 @@ export const videosRouter = createTRPCRouter({
       return video;
     }),
 
-  update: baseProcedure
+  update: adminProcedure
     .input(videoInputSchema.extend({ id: z.string() }))
     .mutation(async ({ input }) => {
       const { id, clipperIds, ...videoData } = input;
@@ -186,7 +186,7 @@ export const videosRouter = createTRPCRouter({
       return video;
     }),
 
-  remove: baseProcedure
+  remove: adminProcedure
     .input(
       z.object({
         id: z.string(),
@@ -202,7 +202,7 @@ export const videosRouter = createTRPCRouter({
       return video;
     }),
 
-  fetchYouTubeMetadata: baseProcedure
+  fetchYouTubeMetadata: adminProcedure
     .input(
       z.object({
         urlOrId: z.string(),

@@ -24,25 +24,29 @@ model Clipper {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  videos      VideoClipper[]
+  videos VideoClipper[]
 
+  // Note: Faceted search uses video_search_mv materialized view
   @@map("clippers")
 }
 
 model Video {
-  id            String   @id @default(cuid())
-  videoId       String   @unique
-  title         String
-  description   String   @db.Text
-  thumbnailUrl  String
-  duration      String
-  channelTitle  String
-  tags          Json     @default("{}")
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id           String   @id @default(cuid())
+  videoId      String   @unique
+  title        String
+  description  String   @db.Text
+  thumbnailUrl String
+  duration     String
+  channelTitle String
+  tags         Json     @default("{}")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  clippers      VideoClipper[]
+  clippers VideoClipper[]
 
+  // Note: Faceted search uses video_search_mv materialized view
+  // Note: GIN index on tags created in migration 20251231034504
+  @@index([createdAt(sort: Desc)])
   @@map("videos")
 }
 
@@ -52,9 +56,74 @@ model VideoClipper {
   clipperId String
   createdAt DateTime @default(now())
 
-  video     Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
-  clipper   Clipper  @relation(fields: [clipperId], references: [id], onDelete: Cascade)
+  video   Video   @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  clipper Clipper @relation(fields: [clipperId], references: [id], onDelete: Cascade)
 
   @@unique([videoId, clipperId])
+  @@index([videoId])
+  @@index([clipperId])
   @@map("video_clippers")
+}
+
+model User {
+  id            String    @id
+  name          String
+  email         String
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+
+  @@unique([email])
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
 }

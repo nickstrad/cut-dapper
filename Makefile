@@ -8,8 +8,10 @@ db/studio:
 
 .PHONY: db/reset
 db/reset:
-	npx prisma migrate reset
-
+	npx prisma migrate reset --force
+	npx prisma migrate dev --name init
+	npx @better-auth/cli@latest generate
+	npx prisma db execute --file prisma/manual_migration_init.sql
 
 .PHONY: db/generate
 db/generate:

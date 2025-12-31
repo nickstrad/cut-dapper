@@ -1,5 +1,5 @@
 import { PAGINATION } from "@/lib/constants";
-import { baseProcedure, createTRPCRouter } from "@/trpc/init";
+import { baseProcedure, adminProcedure, createTRPCRouter } from "@/trpc/init";
 import prisma from "@/lib/db";
 import z from "zod";
 
@@ -81,7 +81,7 @@ export const clippersRouter = createTRPCRouter({
       return clipper;
     }),
 
-  create: baseProcedure
+  create: adminProcedure
     .input(clipperInputSchema)
     .mutation(async ({ input }) => {
       const clipper = await prisma.clipper.create({
@@ -91,7 +91,7 @@ export const clippersRouter = createTRPCRouter({
       return clipper;
     }),
 
-  update: baseProcedure
+  update: adminProcedure
     .input(
       clipperInputSchema.extend({
         id: z.string(),
@@ -108,7 +108,7 @@ export const clippersRouter = createTRPCRouter({
       return clipper;
     }),
 
-  remove: baseProcedure
+  remove: adminProcedure
     .input(
       z.object({
         id: z.string(),

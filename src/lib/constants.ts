@@ -20,8 +20,10 @@ export type Entity = (typeof ENTITIES)[keyof typeof ENTITIES];
 
 export const STATIC_PATHS = {
   HOME: "/",
+  LOGIN: "/login",
   CLIPPERS: `/${ENTITIES.CLIPPERS}`,
   VIDEOS: `/${ENTITIES.VIDEOS}`,
+  SIGNUP: "/signup",
 } as const;
 
 export const PATH_BUILDERS = {

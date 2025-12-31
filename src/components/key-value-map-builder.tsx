@@ -36,7 +36,7 @@ export const KeyValueMapBuilder = ({
 
   // Validate unique keys
   useEffect(() => {
-    const values = fields as Array<{ key: string; value: string }>;
+    const values = fields as Array<{ id: string; key: string; value: string }>;
     const keys = values.map((field) => field.key).filter((key) => key.trim() !== "");
     const duplicates = keys.filter((key, index) => keys.indexOf(key) !== index);
 
@@ -52,8 +52,10 @@ export const KeyValueMapBuilder = ({
       });
     } else {
       // Clear all key errors if no duplicates
+      type FieldArrayError = { key?: { message?: string }; value?: { message?: string } };
+      const nameErrors = formState.errors[name] as FieldArrayError[] | undefined;
       values.forEach((_, index) => {
-        if (formState.errors[name]?.[index]?.key?.message === "Duplicate key") {
+        if (nameErrors?.[index]?.key?.message === "Duplicate key") {
           clearErrors(`${name}.${index}.key`);
         }
       });
@@ -80,7 +82,10 @@ export const KeyValueMapBuilder = ({
         <p className="text-sm text-muted-foreground">{emptyMessage}</p>
       ) : (
         <div className="space-y-3">
-          {fields.map((field, index) => (
+          {fields.map((field, index) => {
+            type FieldArrayError = { key?: { message?: string }; value?: { message?: string } };
+            const nameErrors = formState.errors[name] as FieldArrayError[] | undefined;
+            return (
             <div key={field.id} className="flex gap-2 items-start">
               <div className="flex-1 space-y-2">
                 <div className="grid grid-cols-2 gap-2">
@@ -90,14 +95,14 @@ export const KeyValueMapBuilder = ({
                       placeholder={keyPlaceholder}
                       disabled={disabled}
                       className={
-                        formState.errors[name]?.[index]?.key
+                        nameErrors?.[index]?.key
                           ? "border-destructive"
                           : ""
                       }
                     />
-                    {formState.errors[name]?.[index]?.key && (
+                    {nameErrors?.[index]?.key && (
                       <p className="text-xs text-destructive">
-                        {formState.errors[name][index].key.message as string}
+                        {nameErrors[index].key.message as string}
                       </p>
                     )}
                   </div>
@@ -107,14 +112,14 @@ export const KeyValueMapBuilder = ({
                       placeholder={valuePlaceholder}
                       disabled={disabled}
                       className={
-                        formState.errors[name]?.[index]?.value
+                        nameErrors?.[index]?.value
                           ? "border-destructive"
                           : ""
                       }
                     />
-                    {formState.errors[name]?.[index]?.value && (
+                    {nameErrors?.[index]?.value && (
                       <p className="text-xs text-destructive">
-                        {formState.errors[name][index].value.message as string}
+                        {nameErrors[index].value.message as string}
                       </p>
                     )}
                   </div>
@@ -131,7 +136,8 @@ export const KeyValueMapBuilder = ({
                 <X className="size-4" />
               </Button>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
