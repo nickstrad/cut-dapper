@@ -24,5 +24,37 @@ model Clipper {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  videos      VideoClipper[]
+
   @@map("clippers")
+}
+
+model Video {
+  id            String   @id @default(cuid())
+  videoId       String   @unique
+  title         String
+  description   String   @db.Text
+  thumbnailUrl  String
+  duration      String
+  channelTitle  String
+  tags          Json     @default("{}")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  clippers      VideoClipper[]
+
+  @@map("videos")
+}
+
+model VideoClipper {
+  id        String   @id @default(cuid())
+  videoId   String
+  clipperId String
+  createdAt DateTime @default(now())
+
+  video     Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  clipper   Clipper  @relation(fields: [clipperId], references: [id], onDelete: Cascade)
+
+  @@unique([videoId, clipperId])
+  @@map("video_clippers")
 }

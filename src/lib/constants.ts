@@ -30,6 +30,11 @@ export const PATH_BUILDERS = {
     create: `${STATIC_PATHS.CLIPPERS}/create`,
     edit: (id: string) => `${STATIC_PATHS.CLIPPERS}/${id}/edit`,
   },
+  VIDEOS: {
+    detailsView: (id: string) => `${STATIC_PATHS.VIDEOS}/${id}`,
+    create: `${STATIC_PATHS.VIDEOS}/create`,
+    edit: (id: string) => `${STATIC_PATHS.VIDEOS}/${id}/edit`,
+  },
 } as const;
 
 export const PAGINATION = {

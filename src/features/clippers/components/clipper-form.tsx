@@ -257,7 +257,7 @@ export const ClipperForm = ({ clipper, onSuccess }: ClipperFormProps) => {
         </div>
 
         <div className="flex gap-2">
-          <Button type="submit" disabled={isPending}>
+          <Button type="submit" disabled={isPending} variant="outline">
             {isPending
               ? "Saving..."
               : isEditing

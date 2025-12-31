@@ -1,118 +1,95 @@
-// import { useTRPC } from "@/trpc/client";
-// import {
-//   useMutation,
-//   useQueryClient,
-//   useSuspenseQuery,
-// } from "@tanstack/react-query";
-// import { toast } from "sonner";
-// import { WORKFLOWS_PARAMS } from "../params";
-// import { useQueryStates } from "nuqs";
+import { useTRPC } from "@/trpc/client";
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
+import { toast } from "sonner";
+import { VIDEOS_PARAMS } from "../params";
+import { useQueryStates } from "nuqs";
 
-// export const useSuspenseWorkflows = () => {
-//   const trpc = useTRPC();
-//   const [params] = useWorkflowParams();
+export const useSuspenseVideos = () => {
+  const trpc = useTRPC();
+  const [params] = useVideosParams();
 
-//   return useSuspenseQuery(trpc.workflows.getMany.queryOptions(params));
-// };
+  return useSuspenseQuery(trpc.videos.getMany.queryOptions(params));
+};
 
-// export const useUpdateWorkflow = () => {
-//   const trpc = useTRPC();
-//   const queryClient = useQueryClient();
+export const useSuspenseVideo = ({ id }: { id: string }) => {
+  const trpc = useTRPC();
 
-//   return useMutation(
-//     trpc.workflows.update.mutationOptions({
-//       onSuccess: (data) => {
-//         toast.success(`Workflow "${data.name}" updated`);
-//         queryClient.invalidateQueries(trpc.workflows.getMany.queryOptions({}));
-//         queryClient.invalidateQueries(
-//           trpc.workflows.getOne.queryOptions({ id: data.id })
-//         );
-//       },
-//       onError: (error) => {
-//         toast.error(`Failed to save workflow: ${error.message}`);
-//       },
-//     })
-//   );
-// };
+  return useSuspenseQuery(trpc.videos.getOne.queryOptions({ id }));
+};
 
-// export const useSuspenseWorkflow = ({ id }: { id: string }) => {
-//   const trpc = useTRPC();
+export const useVideosParams = () => {
+  return useQueryStates(VIDEOS_PARAMS);
+};
 
-//   return useSuspenseQuery(trpc.workflows.getOne.queryOptions({ id }));
-// };
+export const useCreateVideo = () => {
+  const queryClient = useQueryClient();
+  const trpc = useTRPC();
 
-// export const useWorkflowParams = () => {
-//   return useQueryStates(WORKFLOWS_PARAMS);
-// };
+  return useMutation(
+    trpc.videos.create.mutationOptions({
+      onSuccess: async (data) => {
+        toast.success(`Video "${data.title}" created`);
+        queryClient.invalidateQueries(trpc.videos.getMany.queryOptions({}));
+      },
+      onError: (error) => {
+        toast.error(`Failed to create video: ${error.message}`);
+      },
+    })
+  );
+};
 
-// export const useUpdateWorkflowName = () => {
-//   const queryClient = useQueryClient();
-//   const trpc = useTRPC();
+export const useUpdateVideo = () => {
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
 
-//   return useMutation(
-//     trpc.workflows.updateName.mutationOptions({
-//       onSuccess: async (data) => {
-//         toast.success(`Workflow name "${data.name}" updated`);
-//         queryClient.invalidateQueries(trpc.workflows.getMany.queryOptions({}));
-//         queryClient.invalidateQueries(
-//           trpc.workflows.getOne.queryOptions({ id: data.id })
-//         );
-//       },
-//       onError: (error) => {
-//         toast.error(`Failed to update workflow : ${error.message}`);
-//       },
-//     })
-//   );
-// };
+  return useMutation(
+    trpc.videos.update.mutationOptions({
+      onSuccess: (data) => {
+        toast.success(`Video "${data.title}" updated`);
+        queryClient.invalidateQueries(trpc.videos.getMany.queryOptions({}));
+        queryClient.invalidateQueries(
+          trpc.videos.getOne.queryOptions({ id: data.id })
+        );
+      },
+      onError: (error) => {
+        toast.error(`Failed to update video: ${error.message}`);
+      },
+    })
+  );
+};
 
-// export const useRemoveWorkflow = () => {
-//   const queryClient = useQueryClient();
-//   const trpc = useTRPC();
+export const useRemoveVideo = () => {
+  const queryClient = useQueryClient();
+  const trpc = useTRPC();
 
-//   return useMutation(
-//     trpc.workflows.remove.mutationOptions({
-//       onSuccess: async (data) => {
-//         toast.success(`Workflow "${data.name}" delete`);
-//         queryClient.invalidateQueries(trpc.workflows.getMany.queryOptions({}));
-//         queryClient.invalidateQueries(
-//           trpc.workflows.getOne.queryFilter({ id: data.id })
-//         );
-//       },
-//       onError: (error) => {
-//         toast.error(`Error creating workflow: ${error.message}`);
-//       },
-//     })
-//   );
-// };
+  return useMutation(
+    trpc.videos.remove.mutationOptions({
+      onSuccess: async (data) => {
+        toast.success(`Video "${data.title}" deleted`);
+        queryClient.invalidateQueries(trpc.videos.getMany.queryOptions({}));
+        queryClient.invalidateQueries(
+          trpc.videos.getOne.queryFilter({ id: data.id })
+        );
+      },
+      onError: (error) => {
+        toast.error(`Failed to delete video: ${error.message}`);
+      },
+    })
+  );
+};
 
-// export const useCreateWorkflow = () => {
-//   const queryClient = useQueryClient();
-//   const trpc = useTRPC();
+export const useFetchYouTubeMetadata = () => {
+  const trpc = useTRPC();
 
-//   return useMutation(
-//     trpc.workflows.create.mutationOptions({
-//       onSuccess: async (data) => {
-//         toast.success(`Workflow "${data.name}" created`);
-//         queryClient.invalidateQueries(trpc.workflows.getMany.queryOptions({}));
-//       },
-//       onError: (error) => {
-//         toast.error(`Error creating workflow: ${error.message}`);
-//       },
-//     })
-//   );
-// };
-
-// export const useExecuteWorkflow = () => {
-//   const trpc = useTRPC();
-
-//   return useMutation(
-//     trpc.workflows.execute.mutationOptions({
-//       onSuccess: (data) => {
-//         toast.success(`Workflow "${data.name}" executed`);
-//       },
-//       onError: (error) => {
-//         toast.error(`Failed to execute workflow: ${error.message}`);
-//       },
-//     })
-//   );
-// };
+  return useMutation(
+    trpc.videos.fetchYouTubeMetadata.mutationOptions({
+      onError: (error) => {
+        toast.error(`Failed to fetch YouTube metadata: ${error.message}`);
+      },
+    })
+  );
+};
