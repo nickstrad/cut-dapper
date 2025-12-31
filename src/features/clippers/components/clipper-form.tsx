@@ -19,10 +19,10 @@ import { useEffect } from "react";
 import { Clipper } from "@/generated/prisma/client";
 
 const formSchema = z.object({
-  name: z.string().min(1, "Name is required"),
+  name: z.string().default(""),
   brand: z.string().min(1, "Brand is required"),
   model: z.string().min(1, "Model is required"),
-  description: z.string().min(1, "Description is required"),
+  description: z.string().default(""),
   amazonUrl: z
     .string()
     .url("Must be a valid URL")

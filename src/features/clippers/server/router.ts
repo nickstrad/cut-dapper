@@ -4,10 +4,10 @@ import prisma from "@/lib/db";
 import z from "zod";
 
 const clipperInputSchema = z.object({
-  name: z.string().min(1, "Name is required"),
+  name: z.string().default(""),
   brand: z.string().min(1, "Brand is required"),
   model: z.string().min(1, "Model is required"),
-  description: z.string().min(1, "Description is required"),
+  description: z.string().default(""),
   amazonUrl: z.string().url("Must be a valid URL").min(1, "Amazon URL is required"),
   imageUrls: z.array(z.string().url("Must be a valid URL")).default([]),
 });

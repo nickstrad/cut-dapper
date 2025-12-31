@@ -7,10 +7,10 @@ import z from "zod";
 const videoInputSchema = z.object({
   videoId: z.string().min(1, "YouTube video ID is required"),
   title: z.string().min(1, "Title is required"),
-  description: z.string().min(1, "Description is required"),
-  thumbnailUrl: z.string().url("Must be a valid URL"),
-  duration: z.string().min(1, "Duration is required"),
-  channelTitle: z.string().min(1, "Channel title is required"),
+  description: z.string().default(""),
+  thumbnailUrl: z.string().default(""),
+  duration: z.string().default(""),
+  channelTitle: z.string().default(""),
   tags: z.record(z.string(), z.string()).default({}),
   clipperIds: z.array(z.string()).default([]),
 });

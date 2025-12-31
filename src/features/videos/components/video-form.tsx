@@ -42,10 +42,10 @@ const formSchema = z
     youtubeUrl: z.string().min(1, "YouTube URL or ID is required"),
     videoId: z.string().min(1, "Video ID is required"),
     title: z.string().min(1, "Title is required"),
-    description: z.string().min(1, "Description is required"),
-    thumbnailUrl: z.string().url("Must be a valid URL"),
-    duration: z.string().min(1, "Duration is required"),
-    channelTitle: z.string().min(1, "Channel title is required"),
+    description: z.string().default(""),
+    thumbnailUrl: z.string().default(""),
+    duration: z.string().default(""),
+    channelTitle: z.string().default(""),
     tags: z.array(
       z.object({ key: z.string().min(1), value: z.string().min(1) })
     ),

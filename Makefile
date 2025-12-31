@@ -12,6 +12,7 @@ db/reset:
 	npx prisma migrate dev --name init
 	npx @better-auth/cli@latest generate
 	npx prisma db execute --file prisma/manual_migration_init.sql
+	npx tsx prisma/seed.ts
 
 .PHONY: db/generate
 db/generate:
