@@ -18,6 +18,36 @@ import axios from "axios";
 import crypto from "crypto";
 import type { FormValues } from "../clippers/components/clipper-form";
 
+// PA-API response types
+interface PaapiImage {
+  Large?: { URL?: string };
+}
+
+interface PaapiItem {
+  ItemInfo?: {
+    Title?: { DisplayValue?: string };
+    Features?: { DisplayValues?: string[] };
+    ByLineInfo?: {
+      Brand?: { DisplayValue?: string };
+      Manufacturer?: { DisplayValue?: string };
+    };
+    ManufactureInfo?: {
+      Brand?: { DisplayValue?: string };
+      Model?: { DisplayValue?: string };
+    };
+    ProductInfo?: {
+      Model?: { DisplayValue?: string };
+    };
+    TechnicalInfo?: {
+      Model?: { DisplayValue?: string };
+    };
+  };
+  Images?: {
+    Primary?: PaapiImage;
+    Variants?: PaapiImage[];
+  };
+}
+
 const PAAPI_HOST = process.env.PAAPI_HOST ?? "webservices.amazon.com";
 const PAAPI_REGION = process.env.PAAPI_REGION ?? "us-east-1";
 const PAAPI_SERVICE = "ProductAdvertisingAPI";
@@ -162,12 +192,12 @@ function pickFirst(...vals: Array<string | undefined | null>): string {
   return "";
 }
 
-function mapPaapiItemToForm(item: any, amazonUrl: string): FormValues {
+function mapPaapiItemToForm(item: PaapiItem, amazonUrl: string): FormValues {
   const name = cleanText(item?.ItemInfo?.Title?.DisplayValue);
 
   // Description: PA-API often provides Features bullets; use them as a readable description
   const features: string[] =
-    item?.ItemInfo?.Features?.DisplayValues?.map((x: any) =>
+    item?.ItemInfo?.Features?.DisplayValues?.map((x) =>
       cleanText(x)
     ).filter(Boolean) ?? [];
   const description = features.length ? features.join("\n") : "";
@@ -190,7 +220,7 @@ function mapPaapiItemToForm(item: any, amazonUrl: string): FormValues {
     ? [item.Images.Primary.Large.URL]
     : [];
   const variants =
-    item?.Images?.Variants?.map((v: any) => v?.Large?.URL).filter(Boolean) ??
+    item?.Images?.Variants?.map((v) => v?.Large?.URL).filter(Boolean) ??
     [];
 
   // Convert to { value: string }[] format to match FormValues type

@@ -16,9 +16,9 @@ import { Filter } from "lucide-react";
 
 export const SearchPageContent = () => {
   const { data } = useSuspenseSearch();
-  const [params, setParams] = useSearchParams();
+  const [, setParams] = useSearchParams();
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-  const [isPendingTransition, startTransition] = useTransition();
+  const [isPendingTransition] = useTransition();
 
   // Calculate active filter count for mobile button badge
   const activeFilterCount =

@@ -1,21 +1,39 @@
-import { dirname } from "path";
-import { fileURLToPath } from "url";
-import { FlatCompat } from "@eslint/eslintrc";
+// eslint.config.mjs
+import js from "@eslint/js";
+import tseslint from "typescript-eslint";
+import nextPlugin from "@next/eslint-plugin-next";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-});
-
-const eslintConfig = [
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
+export default [
+  // ✅ Global ignores (apply to everything)
   {
     ignores: [
-      "src/generated/prisma/**"
+      "**/.next/**",
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/build/**",
+      "**/out/**",
+      "**/coverage/**",
+      "**/.turbo/**",
+      "**/.vercel/**",
+
+      // your generated / vendored code
+      "src/generated/**",
+      "src/components/ui/**",
+
+      // optional: prisma artifacts (migrations etc.)
+      "prisma/migrations/**",
     ],
   },
-];
 
-export default eslintConfig;
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
+
+  {
+    files: ["**/*.{js,jsx,ts,tsx}"],
+    plugins: { "@next/next": nextPlugin },
+    rules: {
+      ...nextPlugin.configs.recommended.rules,
+      ...nextPlugin.configs["core-web-vitals"].rules,
+    },
+  },
+];

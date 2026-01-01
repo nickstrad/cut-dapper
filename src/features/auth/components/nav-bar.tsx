@@ -27,7 +27,6 @@ export async function NavBar() {
               user={{
                 ...session.user,
                 image: session.user.image ?? null,
-                settings: {},
               }}
             />
           ) : (

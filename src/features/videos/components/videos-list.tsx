@@ -75,7 +75,7 @@ export const VideosList = ({ showActions = false }: VideosListProps) => {
     setSearchValue(params.search);
   }, [params.search]);
 
-  const handleDelete = (id: string, title: string) => {
+  const handleDelete = (id: string) => {
     setDeletingId(id);
     removeVideo(
       { id },
@@ -296,7 +296,7 @@ export const VideosList = ({ showActions = false }: VideosListProps) => {
                                 <Button
                                   variant="destructive"
                                   onClick={() =>
-                                    handleDelete(video.id, video.title)
+                                    handleDelete(video.id)
                                   }
                                   disabled={
                                     isPending && deletingId === video.id

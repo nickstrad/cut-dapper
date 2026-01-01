@@ -3,6 +3,14 @@ import { baseProcedure, createTRPCRouter } from "@/trpc/init";
 import prisma from "@/lib/db";
 import { PAGINATION } from "@/lib/constants";
 
+// Types for database query results
+interface ClipperDetails {
+  id: string;
+  name: string;
+  brand: string;
+  model: string;
+}
+
 const searchInputSchema = z.object({
   // Pagination
   page: z.number().default(PAGINATION.DEFAULT_PAGE),
@@ -31,9 +39,9 @@ function buildSqlWhereConditions(filters: {
   brands: string[];
   models: string[];
   tags: Record<string, string[]>;
-}): { sql: string; params: any[] } {
+}): { sql: string; params: unknown[] } {
   const conditions: string[] = [];
-  const params: any[] = [];
+  const params: unknown[] = [];
   let paramIndex = 1;
 
   // Text search across multiple fields (case-insensitive)
@@ -191,10 +199,10 @@ export const searchRouter = createTRPCRouter({
           thumbnailUrl: string;
           duration: string;
           channelTitle: string;
-          tags: any;
+          tags: Record<string, string>;
           createdAt: Date;
           updatedAt: Date;
-          clipper_details: any;
+          clipper_details: ClipperDetails[];
         }>
       >(
         `
@@ -239,7 +247,7 @@ export const searchRouter = createTRPCRouter({
     // Transform clipper_details from JSONB to match expected structure
     const videos = videosRaw.map((video) => ({
       ...video,
-      clippers: (video.clipper_details as any[]).map((clipper) => ({
+      clippers: video.clipper_details.map((clipper) => ({
         clipper: {
           id: clipper.id,
           name: clipper.name,
