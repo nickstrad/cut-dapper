@@ -73,21 +73,6 @@ export function SignUpForm() {
     );
   };
 
-  const signInGithub = async () => {
-    await authClient.signIn.social(
-      {
-        provider: "github",
-      },
-      {
-        onSuccess: () => {
-          router.push(STATIC_PATHS.HOME);
-        },
-        onError: () => {
-          toast.error("Something went wrong.");
-        },
-      }
-    );
-  };
   const signInGoogle = async () => {
     await authClient.signIn.social(
       {
@@ -116,22 +101,6 @@ export function SignUpForm() {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
             <CardContent className="grid gap-4">
-              <Button
-                variant="outline"
-                className="w-full"
-                type="button"
-                disabled={isPending}
-                onClick={signInGithub}
-              >
-                <Image
-                  src="/logos/github.svg"
-                  alt="GitHub Logo"
-                  width={20}
-                  height={20}
-                  className="mr-2"
-                />
-                Continue with Github
-              </Button>
               <Button
                 variant="outline"
                 className="w-full"
