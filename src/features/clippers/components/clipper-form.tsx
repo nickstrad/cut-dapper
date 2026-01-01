@@ -42,7 +42,7 @@ type ClipperFormProps = {
 };
 
 export const ClipperForm = ({ clipper, onSuccess }: ClipperFormProps) => {
-  const isEditing = !!clipper;
+  const isEditing = !!clipper && !!clipper.id;
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),

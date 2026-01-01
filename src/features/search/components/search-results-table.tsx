@@ -16,15 +16,15 @@ import {
 } from "@/components/ui/tooltip";
 import { TruncatedText } from "@/components/ui/truncated-text";
 import { formatDuration, parseDuration } from "@/lib/utils/time-formatters";
-import { PATH_BUILDERS } from "@/lib/constants";
-import Link from "next/link";
 import { EntityPagination } from "@/components/entity-pagination";
+import { ExternalLink } from "lucide-react";
 
 type Clipper = {
   id: string;
   name: string;
   brand: string;
   model: string;
+  amazonUrl: string;
 };
 
 type VideoClipper = {
@@ -33,6 +33,7 @@ type VideoClipper = {
 
 type Video = {
   id: string;
+  videoId: string;
   title: string;
   channelTitle: string;
   duration: string;
@@ -91,19 +92,15 @@ export const SearchResultsTable = ({
             return (
               <TableRow key={video.id}>
                 <TableCell className="font-medium w-[30%]">
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Link
-                        href={PATH_BUILDERS.VIDEOS.detailsView(video.id)}
-                        className="hover:underline line-clamp-2 block"
-                      >
-                        <TruncatedText text={video.title} maxWidth="100%" />
-                      </Link>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p className="max-w-md">{video.title}</p>
-                    </TooltipContent>
-                  </Tooltip>
+                  <a
+                    href={`https://www.youtube.com/watch?v=${video.videoId}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:underline flex items-start gap-1.5 group"
+                  >
+                    <ExternalLink className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+                    <span className="line-clamp-3">{video.title}</span>
+                  </a>
                 </TableCell>
                 <TableCell className="w-[15%]">
                   <TruncatedText text={video.channelTitle} maxWidth="100%" />
@@ -123,7 +120,10 @@ export const SearchResultsTable = ({
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <div className="flex flex-col gap-1 cursor-help">
-                            <Badge variant="secondary" className="text-xs w-fit">
+                            <Badge
+                              variant="secondary"
+                              className="text-xs w-fit"
+                            >
                               {tagKeys[0]}
                             </Badge>
                             {tagKeys.length > 1 && (
@@ -149,35 +149,22 @@ export const SearchResultsTable = ({
                 </TableCell>
                 <TableCell className="w-[22.5%]">
                   {video.clippers.length > 0 ? (
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <div className="flex flex-col gap-1 cursor-help">
-                          {video.clippers.slice(0, 2).map((vc) => (
-                            <span
-                              key={vc.clipper.id}
-                              className="text-sm truncate"
-                            >
-                              {vc.clipper.brand} {vc.clipper.model}
-                            </span>
-                          ))}
-                          {video.clippers.length > 2 && (
-                            <span className="text-sm text-muted-foreground">
-                              +{video.clippers.length - 2} more
-                            </span>
-                          )}
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <div className="text-xs max-w-md space-y-1">
-                          {video.clippers.map((vc) => (
-                            <div key={vc.clipper.id}>
-                              {vc.clipper.brand} {vc.clipper.model} -{" "}
-                              {vc.clipper.name}
-                            </div>
-                          ))}
-                        </div>
-                      </TooltipContent>
-                    </Tooltip>
+                    <div className="flex flex-wrap gap-1.5">
+                      {video.clippers.map((vc) => (
+                        <a
+                          key={vc.clipper.id}
+                          href={vc.clipper.amazonUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm hover:underline flex items-center gap-1 group"
+                        >
+                          <ExternalLink className="h-3 w-3 shrink-0" />
+                          <span>
+                            {vc.clipper.brand} {vc.clipper.model}
+                          </span>
+                        </a>
+                      ))}
+                    </div>
                   ) : (
                     <span className="text-sm text-muted-foreground">
                       No clippers

@@ -197,14 +197,15 @@ export const FacetedSearchPanel = ({
 
       {/* Active Filters */}
       {hasActiveFilters && (
-        <div className="space-y-2">
+        <div className="space-y-3 pb-4 border-b">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium">Active Filters</span>
+            <span className="text-sm font-semibold tracking-tight">Active Filters</span>
             <Button
               variant="ghost"
               size="sm"
               onClick={handleClearAll}
               disabled={isPending}
+              className="h-7 text-xs"
             >
               Clear all
             </Button>
@@ -291,7 +292,7 @@ export const FacetedSearchPanel = ({
         {/* Channels */}
         {facets.channels.length > 0 && (
           <AccordionItem value="channels">
-            <AccordionTrigger>
+            <AccordionTrigger className="text-sm font-semibold">
               Channels ({facets.channels.length})
             </AccordionTrigger>
             <AccordionContent>
@@ -307,9 +308,10 @@ export const FacetedSearchPanel = ({
                       />
                       <Label
                         htmlFor={`channel-${channel.value}`}
-                        className="flex-1 cursor-pointer text-sm font-normal"
+                        className="flex-1 cursor-pointer text-sm font-normal leading-relaxed"
                       >
-                        {channel.value} ({channel.count})
+                        <span className="font-medium">{channel.value}</span>
+                        <span className="text-muted-foreground/60 ml-1">({channel.count})</span>
                       </Label>
                     </div>
                   ))}
@@ -322,7 +324,7 @@ export const FacetedSearchPanel = ({
         {/* Brands */}
         {facets.brands.length > 0 && (
           <AccordionItem value="brands">
-            <AccordionTrigger>
+            <AccordionTrigger className="text-sm font-semibold">
               Brands ({facets.brands.length})
             </AccordionTrigger>
             <AccordionContent>
@@ -338,9 +340,10 @@ export const FacetedSearchPanel = ({
                       />
                       <Label
                         htmlFor={`brand-${brand.value}`}
-                        className="flex-1 cursor-pointer text-sm font-normal"
+                        className="flex-1 cursor-pointer text-sm font-normal leading-relaxed"
                       >
-                        {brand.value} ({brand.count})
+                        <span className="font-medium">{brand.value}</span>
+                        <span className="text-muted-foreground/60 ml-1">({brand.count})</span>
                       </Label>
                     </div>
                   ))}
@@ -353,7 +356,7 @@ export const FacetedSearchPanel = ({
         {/* Models */}
         {facets.models.length > 0 && (
           <AccordionItem value="models">
-            <AccordionTrigger>
+            <AccordionTrigger className="text-sm font-semibold">
               Models ({facets.models.length})
             </AccordionTrigger>
             <AccordionContent>
@@ -369,9 +372,10 @@ export const FacetedSearchPanel = ({
                       />
                       <Label
                         htmlFor={`model-${model.value}`}
-                        className="flex-1 cursor-pointer text-sm font-normal"
+                        className="flex-1 cursor-pointer text-sm font-normal leading-relaxed"
                       >
-                        {model.value} ({model.count})
+                        <span className="font-medium">{model.value}</span>
+                        <span className="text-muted-foreground/60 ml-1">({model.count})</span>
                       </Label>
                     </div>
                   ))}
@@ -384,7 +388,7 @@ export const FacetedSearchPanel = ({
         {/* Tags (Nested Accordion) */}
         {Object.keys(facets.tags).length > 0 && (
           <AccordionItem value="tags">
-            <AccordionTrigger>
+            <AccordionTrigger className="text-sm font-semibold">
               Tags ({Object.keys(facets.tags).length})
             </AccordionTrigger>
             <AccordionContent>
@@ -415,9 +419,10 @@ export const FacetedSearchPanel = ({
                               />
                               <Label
                                 htmlFor={`tag-${tagKey}-${tag.value}`}
-                                className="flex-1 cursor-pointer text-sm font-normal"
+                                className="flex-1 cursor-pointer text-sm font-normal leading-relaxed"
                               >
-                                {tag.value} ({tag.count})
+                                <span className="font-medium">{tag.value}</span>
+                                <span className="text-muted-foreground/60 ml-1">({tag.count})</span>
                               </Label>
                             </div>
                           ))}

@@ -17,10 +17,10 @@ export default async function HomePage({ searchParams }: Props) {
   prefetchSearch(params);
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">Discover Haircut Tutorials</h1>
-        <p className="text-muted-foreground mt-2">
+    <div className="container mx-auto py-8 space-y-8">
+      <div className="space-y-2">
+        <h1 className="text-4xl font-bold tracking-tight">Discover Haircut Tutorials</h1>
+        <p className="text-base text-muted-foreground/80">
           Search and filter videos by channel, clipper, and style
         </p>
       </div>

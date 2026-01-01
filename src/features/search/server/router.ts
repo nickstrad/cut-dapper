@@ -9,6 +9,7 @@ interface ClipperDetails {
   name: string;
   brand: string;
   model: string;
+  amazonUrl: string;
 }
 
 const searchInputSchema = z.object({
@@ -253,6 +254,7 @@ export const searchRouter = createTRPCRouter({
           name: clipper.name,
           brand: clipper.brand,
           model: clipper.model,
+          amazonUrl: clipper.amazonUrl,
         },
       })),
     }));

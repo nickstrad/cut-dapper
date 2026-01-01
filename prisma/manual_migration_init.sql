@@ -26,7 +26,7 @@ SELECT
   COALESCE(array_agg(DISTINCT c.brand) FILTER (WHERE c.brand IS NOT NULL), '{}') AS brands,
   COALESCE(array_agg(DISTINCT c.model) FILTER (WHERE c.model IS NOT NULL), '{}') AS models,
   -- Keep clipper details for display (as JSONB array)
-  COALESCE(jsonb_agg(DISTINCT jsonb_build_object('id', c.id, 'name', c.name, 'brand', c.brand, 'model', c.model)) FILTER (WHERE c.id IS NOT NULL), '[]'::jsonb) AS clipper_details
+  COALESCE(jsonb_agg(DISTINCT jsonb_build_object('id', c.id, 'name', c.name, 'brand', c.brand, 'model', c.model, 'amazonUrl', c."amazonUrl")) FILTER (WHERE c.id IS NOT NULL), '[]'::jsonb) AS clipper_details
 FROM
   videos v
   LEFT JOIN video_clippers vc ON v.id = vc."videoId"

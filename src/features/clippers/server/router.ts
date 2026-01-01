@@ -2,7 +2,10 @@ import { PAGINATION } from "@/lib/constants";
 import { adminProcedure, createTRPCRouter } from "@/trpc/init";
 import prisma from "@/lib/db";
 import z from "zod";
-import { extractClipperFromAmazonURL, batchExtractClippers } from "./llm-extract";
+import {
+  extractClipperFromAmazonURL,
+  batchExtractClippers,
+} from "./llm-extract";
 
 const clipperInputSchema = z.object({
   name: z.string().default(""),
@@ -210,6 +213,7 @@ export const clippersRouter = createTRPCRouter({
         provider,
       });
 
+      console.log("Batch extraction results:", results);
       // Create clippers for successful extractions
       const createdClippers = [];
       const errors = [];
@@ -224,7 +228,10 @@ export const clippersRouter = createTRPCRouter({
           } catch (error) {
             errors.push({
               url: result.url,
-              error: error instanceof Error ? error.message : "Failed to create clipper",
+              error:
+                error instanceof Error
+                  ? error.message
+                  : "Failed to create clipper",
             });
           }
         } else {

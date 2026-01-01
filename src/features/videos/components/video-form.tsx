@@ -147,7 +147,7 @@ export const VideoForm = ({ video, onSuccess }: VideoFormProps) => {
     }, 800); // 800ms debounce
 
     return () => clearTimeout(timer);
-  }, [youtubeUrl, isEditing, fetchMetadataMutation, form]);
+  }, [youtubeUrl, isEditing]);
 
   const onSubmit = (data: VideoFormValues) => {
     // Convert array of {key, value} to Record<string, string>

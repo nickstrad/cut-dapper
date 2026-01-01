@@ -32,21 +32,29 @@ export const SearchPageContent = () => {
     (data.input.search ? 1 : 0);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-[320px_1fr] gap-6">
       {/* Desktop Sidebar */}
       <aside className="hidden md:block">
         <div className="sticky top-4">
-          <FacetedSearchPanel
-            facets={data.facets}
-            onFilterChange={() => {
-              // Filters are managed via URL params, no callback needed
-            }}
-          />
+          <div className="rounded-lg border bg-card/50 backdrop-blur-sm p-6 space-y-6 shadow-sm">
+            <div className="space-y-1">
+              <h2 className="text-lg font-semibold tracking-tight">Filters</h2>
+              <p className="text-sm text-muted-foreground/70">
+                Refine your search
+              </p>
+            </div>
+            <FacetedSearchPanel
+              facets={data.facets}
+              onFilterChange={() => {
+                // Filters are managed via URL params, no callback needed
+              }}
+            />
+          </div>
         </div>
       </aside>
 
       {/* Mobile Filter Button & Sheet */}
-      <div className="md:hidden mb-4">
+      <div className="md:hidden">
         <Sheet open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
           <SheetTrigger asChild>
             <Button variant="outline" className="w-full">
@@ -76,15 +84,25 @@ export const SearchPageContent = () => {
         </Sheet>
       </div>
 
-      {/* Results Table */}
-      <main>
-        <SearchResultsTable
-          videos={data.videos}
-          pagination={data.pagination}
-          onPageChange={(page) => setParams({ page })}
-          onPageSizeChange={(pageSize) => setParams({ pageSize, page: 1 })}
-          disabled={isPendingTransition}
-        />
+      {/* Results Section */}
+      <main className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="space-y-1">
+            <h2 className="text-2xl font-bold tracking-tight">Search Results</h2>
+            <p className="text-sm text-muted-foreground/70">
+              Showing {data.pagination.total} {data.pagination.total === 1 ? 'video' : 'videos'}
+            </p>
+          </div>
+        </div>
+        <div className="rounded-lg border bg-card/30 backdrop-blur-sm shadow-sm">
+          <SearchResultsTable
+            videos={data.videos}
+            pagination={data.pagination}
+            onPageChange={(page) => setParams({ page })}
+            onPageSizeChange={(pageSize) => setParams({ pageSize, page: 1 })}
+            disabled={isPendingTransition}
+          />
+        </div>
       </main>
     </div>
   );
