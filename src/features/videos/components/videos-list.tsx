@@ -37,6 +37,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { TruncatedText } from "@/components/ui/truncated-text";
+import { EntityPagination } from "@/components/entity-pagination";
 
 type VideosListProps = {
   showActions?: boolean;
@@ -46,7 +47,7 @@ export const VideosList = ({ showActions = false }: VideosListProps) => {
   const { data } = useSuspenseVideos();
   const [params, setParams] = useVideosParams();
   const [searchValue, setSearchValue] = useState(params.search);
-  const [, startTransition] = useTransition();
+  const [isPendingTransition, startTransition] = useTransition();
   const { mutate: removeVideo, isPending } = useRemoveVideo();
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState<string | null>(null);
@@ -65,7 +66,7 @@ export const VideosList = ({ showActions = false }: VideosListProps) => {
   // Update URL params when debounced value changes
   useEffect(() => {
     startTransition(() => {
-      setParams({ search: debouncedSearchValue, page: 1 });
+      setParams({ search: debouncedSearchValue, page: params.page ?? 1 });
     });
   }, [debouncedSearchValue, setParams]);
 
@@ -174,7 +175,9 @@ export const VideosList = ({ showActions = false }: VideosListProps) => {
                         className="whitespace-nowrap"
                       />
                     </TableCell>
-                    <TableCell className={showActions ? "w-[20%]" : "w-[22.5%]"}>
+                    <TableCell
+                      className={showActions ? "w-[20%]" : "w-[22.5%]"}
+                    >
                       {(() => {
                         const tags = video.tags as Record<string, string>;
                         const tagKeys = Object.keys(tags);
@@ -209,7 +212,9 @@ export const VideosList = ({ showActions = false }: VideosListProps) => {
                         );
                       })()}
                     </TableCell>
-                    <TableCell className={showActions ? "w-[20%]" : "w-[22.5%]"}>
+                    <TableCell
+                      className={showActions ? "w-[20%]" : "w-[22.5%]"}
+                    >
                       {video.clippers.length > 0 ? (
                         <Tooltip>
                           <TooltipTrigger asChild>
@@ -311,9 +316,17 @@ export const VideosList = ({ showActions = false }: VideosListProps) => {
             </TableBody>
           </Table>
 
-          <div className="text-sm text-muted-foreground">
-            Showing {data.videos.length} of {data.pagination.total} videos
-          </div>
+          <EntityPagination
+            page={data.pagination.page}
+            pageSize={data.pagination.pageSize}
+            totalCount={data.pagination.total}
+            totalPages={data.pagination.totalPages}
+            hasNextPage={data.pagination.page < data.pagination.totalPages}
+            hasPreviousPage={data.pagination.page > 1}
+            disabled={isPendingTransition}
+            onPageChange={(page) => setParams({ page })}
+            onPageSizeChange={(pageSize) => setParams({ pageSize, page: 1 })}
+          />
         </>
       )}
     </div>

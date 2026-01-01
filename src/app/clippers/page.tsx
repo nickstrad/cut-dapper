@@ -28,9 +28,14 @@ export default async function ClippersPage({ searchParams }: Props) {
             Manage your clipper collection
           </p>
         </div>
-        <Link href={PATH_BUILDERS.CLIPPERS.create}>
-          <Button variant="outline">Create New Clipper</Button>
-        </Link>
+        <div className="flex gap-2">
+          <Link href={PATH_BUILDERS.CLIPPERS.bulk}>
+            <Button variant="outline">Bulk Import from Amazon</Button>
+          </Link>
+          <Link href={PATH_BUILDERS.CLIPPERS.create}>
+            <Button variant="outline">Create New Clipper</Button>
+          </Link>
+        </div>
       </div>
 
       <HydrateClient>

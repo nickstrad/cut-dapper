@@ -33,7 +33,10 @@ export const useCreateVideo = () => {
     trpc.videos.create.mutationOptions({
       onSuccess: async (data) => {
         toast.success(`Video "${data.title}" created`);
-        queryClient.invalidateQueries(trpc.videos.getMany.queryOptions({}));
+        // Invalidate all getMany queries regardless of params
+        queryClient.invalidateQueries({
+          queryKey: [["videos", "getMany"]],
+        });
       },
       onError: (error) => {
         toast.error(`Failed to create video: ${error.message}`);
@@ -50,10 +53,13 @@ export const useUpdateVideo = () => {
     trpc.videos.update.mutationOptions({
       onSuccess: (data) => {
         toast.success(`Video "${data.title}" updated`);
-        queryClient.invalidateQueries(trpc.videos.getMany.queryOptions({}));
-        queryClient.invalidateQueries(
-          trpc.videos.getOne.queryOptions({ id: data.id })
-        );
+        // Invalidate all getMany queries regardless of params
+        queryClient.invalidateQueries({
+          queryKey: [["videos", "getMany"]],
+        });
+        queryClient.invalidateQueries({
+          queryKey: [["videos", "getOne"], { input: { id: data.id } }],
+        });
       },
       onError: (error) => {
         toast.error(`Failed to update video: ${error.message}`);
@@ -70,10 +76,13 @@ export const useRemoveVideo = () => {
     trpc.videos.remove.mutationOptions({
       onSuccess: async (data) => {
         toast.success(`Video "${data.title}" deleted`);
-        queryClient.invalidateQueries(trpc.videos.getMany.queryOptions({}));
-        queryClient.invalidateQueries(
-          trpc.videos.getOne.queryFilter({ id: data.id })
-        );
+        // Invalidate all getMany queries regardless of params
+        queryClient.invalidateQueries({
+          queryKey: [["videos", "getMany"]],
+        });
+        queryClient.invalidateQueries({
+          queryKey: [["videos", "getOne"], { input: { id: data.id } }],
+        });
       },
       onError: (error) => {
         toast.error(`Failed to delete video: ${error.message}`);

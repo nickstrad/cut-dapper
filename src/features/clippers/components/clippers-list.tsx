@@ -29,6 +29,7 @@ import Link from "next/link";
 import { PATH_BUILDERS } from "@/lib/constants";
 import { useState, useEffect, useTransition } from "react";
 import { useDebounce } from "react-use";
+import { EntityPagination } from "@/components/entity-pagination";
 
 export const ClippersList = () => {
   const { data } = useSuspenseClippers();
@@ -53,7 +54,7 @@ export const ClippersList = () => {
   // Update URL params when debounced value changes
   useEffect(() => {
     startTransition(() => {
-      setParams({ search: debouncedSearchValue, page: 1 });
+      setParams({ search: debouncedSearchValue, page: params.page ?? 1 });
     });
   }, [debouncedSearchValue, setParams, startTransition]);
 
@@ -62,7 +63,7 @@ export const ClippersList = () => {
     setSearchValue(params.search);
   }, [params.search]);
 
-  const handleDelete = (id: string, name: string) => {
+  const handleDelete = (id: string) => {
     setDeletingId(id);
     removeClipper(
       { id },
@@ -162,9 +163,7 @@ export const ClippersList = () => {
                             </Button>
                             <Button
                               variant="destructive"
-                              onClick={() =>
-                                handleDelete(clipper.id, clipper.name)
-                              }
+                              onClick={() => handleDelete(clipper.id)}
                               disabled={isPending && deletingId === clipper.id}
                             >
                               Delete
@@ -179,9 +178,17 @@ export const ClippersList = () => {
             </TableBody>
           </Table>
 
-          <div className="text-sm text-muted-foreground">
-            Showing {data.clippers.length} of {data.pagination.total} clippers
-          </div>
+          <EntityPagination
+            page={data.pagination.page}
+            pageSize={data.pagination.pageSize}
+            totalCount={data.pagination.total}
+            totalPages={data.pagination.totalPages}
+            hasNextPage={data.pagination.page < data.pagination.totalPages}
+            hasPreviousPage={data.pagination.page > 1}
+            disabled={isPendingTransition}
+            onPageChange={(page) => setParams({ page })}
+            onPageSizeChange={(pageSize) => setParams({ pageSize, page: 1 })}
+          />
         </>
       )}
     </div>

@@ -33,7 +33,10 @@ export const useCreateClipper = () => {
     trpc.clippers.create.mutationOptions({
       onSuccess: async (data) => {
         toast.success(`Clipper "${data.name}" created`);
-        queryClient.invalidateQueries(trpc.clippers.getMany.queryOptions({}));
+        // Invalidate all getMany queries regardless of params
+        queryClient.invalidateQueries({
+          queryKey: [["clippers", "getMany"]],
+        });
       },
       onError: (error) => {
         toast.error(`Failed to create clipper: ${error.message}`);
@@ -50,10 +53,13 @@ export const useUpdateClipper = () => {
     trpc.clippers.update.mutationOptions({
       onSuccess: (data) => {
         toast.success(`Clipper "${data.name}" updated`);
-        queryClient.invalidateQueries(trpc.clippers.getMany.queryOptions({}));
-        queryClient.invalidateQueries(
-          trpc.clippers.getOne.queryOptions({ id: data.id })
-        );
+        // Invalidate all getMany queries regardless of params
+        queryClient.invalidateQueries({
+          queryKey: [["clippers", "getMany"]],
+        });
+        queryClient.invalidateQueries({
+          queryKey: [["clippers", "getOne"], { input: { id: data.id } }],
+        });
       },
       onError: (error) => {
         toast.error(`Failed to update clipper: ${error.message}`);
@@ -70,10 +76,13 @@ export const useRemoveClipper = () => {
     trpc.clippers.remove.mutationOptions({
       onSuccess: async (data) => {
         toast.success(`Clipper "${data.name}" deleted`);
-        queryClient.invalidateQueries(trpc.clippers.getMany.queryOptions({}));
-        queryClient.invalidateQueries(
-          trpc.clippers.getOne.queryFilter({ id: data.id })
-        );
+        // Invalidate all getMany queries regardless of params
+        queryClient.invalidateQueries({
+          queryKey: [["clippers", "getMany"]],
+        });
+        queryClient.invalidateQueries({
+          queryKey: [["clippers", "getOne"], { input: { id: data.id } }],
+        });
       },
       onError: (error) => {
         toast.error(`Failed to delete clipper: ${error.message}`);

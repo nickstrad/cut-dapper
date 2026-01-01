@@ -1,19 +1,23 @@
 import { PAGINATION } from "@/lib/constants";
-import { baseProcedure, adminProcedure, createTRPCRouter } from "@/trpc/init";
+import { adminProcedure, createTRPCRouter } from "@/trpc/init";
 import prisma from "@/lib/db";
 import z from "zod";
+import { extractClipperFromAmazonURL, batchExtractClippers } from "./llm-extract";
 
 const clipperInputSchema = z.object({
   name: z.string().default(""),
   brand: z.string().min(1, "Brand is required"),
   model: z.string().min(1, "Model is required"),
   description: z.string().default(""),
-  amazonUrl: z.string().url("Must be a valid URL").min(1, "Amazon URL is required"),
+  amazonUrl: z
+    .string()
+    .url("Must be a valid URL")
+    .min(1, "Amazon URL is required"),
   imageUrls: z.array(z.string().url("Must be a valid URL")).default([]),
 });
 
 export const clippersRouter = createTRPCRouter({
-  getMany: baseProcedure
+  getMany: adminProcedure
     .input(
       z.object({
         page: z.number().default(PAGINATION.DEFAULT_PAGE),
@@ -35,7 +39,9 @@ export const clippersRouter = createTRPCRouter({
               { name: { contains: search, mode: "insensitive" as const } },
               { brand: { contains: search, mode: "insensitive" as const } },
               { model: { contains: search, mode: "insensitive" as const } },
-              { description: { contains: search, mode: "insensitive" as const } },
+              {
+                description: { contains: search, mode: "insensitive" as const },
+              },
             ],
           }
         : {};
@@ -61,7 +67,7 @@ export const clippersRouter = createTRPCRouter({
       };
     }),
 
-  getOne: baseProcedure
+  getOne: adminProcedure
     .input(
       z.object({
         id: z.string(),
@@ -122,5 +128,116 @@ export const clippersRouter = createTRPCRouter({
       });
 
       return clipper;
+    }),
+
+  // LLM-powered extraction from Amazon URL
+  extractFromAmazonURL: adminProcedure
+    .input(
+      z.object({
+        url: z.string().url("Must be a valid URL"),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const provider =
+        (process.env.AI_PROVIDER as "openai" | "anthropic" | "google") ||
+        "openai";
+      const extractedData = await extractClipperFromAmazonURL({
+        url: input.url,
+        provider,
+      });
+
+      return extractedData;
+    }),
+
+  // Extract and immediately create clipper
+  extractAndCreate: adminProcedure
+    .input(
+      z.object({
+        url: z.string().url("Must be a valid URL"),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const provider =
+        (process.env.AI_PROVIDER as "openai" | "anthropic" | "google") ||
+        "openai";
+
+      const extractedData = await extractClipperFromAmazonURL({
+        url: input.url,
+        provider,
+      });
+
+      const clipper = await prisma.clipper.create({
+        data: extractedData,
+      });
+
+      return clipper;
+    }),
+
+  // Batch extract from multiple Amazon URLs
+  batchExtractFromAmazonURLs: adminProcedure
+    .input(
+      z.object({
+        urls: z.array(z.string().url("Must be a valid URL")).min(1),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const provider =
+        (process.env.AI_PROVIDER as "openai" | "anthropic" | "google") ||
+        "openai";
+
+      const results = await batchExtractClippers({
+        urls: input.urls,
+        provider,
+      });
+
+      return results;
+    }),
+
+  // Batch extract and create clippers
+  batchExtractAndCreate: adminProcedure
+    .input(
+      z.object({
+        urls: z.array(z.string().url("Must be a valid URL")).min(1),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const provider =
+        (process.env.AI_PROVIDER as "openai" | "anthropic" | "google") ||
+        "openai";
+
+      const results = await batchExtractClippers({
+        urls: input.urls,
+        provider,
+      });
+
+      // Create clippers for successful extractions
+      const createdClippers = [];
+      const errors = [];
+
+      for (const result of results) {
+        if (result.status === "success" && result.data) {
+          try {
+            const clipper = await prisma.clipper.create({
+              data: result.data,
+            });
+            createdClippers.push(clipper);
+          } catch (error) {
+            errors.push({
+              url: result.url,
+              error: error instanceof Error ? error.message : "Failed to create clipper",
+            });
+          }
+        } else {
+          errors.push({
+            url: result.url,
+            error: result.error || "Extraction failed",
+          });
+        }
+      }
+
+      return {
+        created: createdClippers,
+        errors,
+      };
     }),
 });

@@ -31,6 +31,7 @@ export const PATH_BUILDERS = {
     detailsView: (id: string) => `${STATIC_PATHS.CLIPPERS}/${id}`,
     create: `${STATIC_PATHS.CLIPPERS}/create`,
     edit: (id: string) => `${STATIC_PATHS.CLIPPERS}/${id}/edit`,
+    bulk: `${STATIC_PATHS.CLIPPERS}/bulk`,
   },
   VIDEOS: {
     detailsView: (id: string) => `${STATIC_PATHS.VIDEOS}/${id}`,
