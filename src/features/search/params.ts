@@ -5,6 +5,9 @@ import {
   parseAsJson,
 } from "nuqs/server";
 import { PAGINATION } from "@/lib/constants";
+import { z } from "zod";
+
+const tagsSchema = z.record(z.string(), z.array(z.string()));
 
 export const SEARCH_PARAMS = {
   // Pagination
@@ -17,9 +20,7 @@ export const SEARCH_PARAMS = {
     .withOptions({ clearOnDefault: true }),
 
   // Text search
-  search: parseAsString
-    .withDefault("")
-    .withOptions({ clearOnDefault: true }),
+  search: parseAsString.withDefault("").withOptions({ clearOnDefault: true }),
 
   // Facet filters - arrays of strings
   channels: parseAsArrayOf(parseAsString)
@@ -35,7 +36,7 @@ export const SEARCH_PARAMS = {
     .withOptions({ clearOnDefault: true }),
 
   // Tag filters - JSON object { "hairstyle": ["fade"], "difficulty": ["beginner"] }
-  tags: parseAsJson<Record<string, string[]>>()
-    .withDefault({} as Record<string, string[]>)
+  tags: parseAsJson<Record<string, string[]>>(tagsSchema)
+    .withDefault({})
     .withOptions({ clearOnDefault: true }),
 } as const;

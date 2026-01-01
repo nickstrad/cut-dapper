@@ -5,7 +5,7 @@ export const SearchLoading = () => {
     <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-6">
       <div className="space-y-4">
         <Skeleton className="h-10 w-full" />
-        <Skeleton className="h-[400px] w-full" />
+        <Skeleton className="h-100 w-full" />
       </div>
       <div className="space-y-4">
         <Skeleton className="h-12 w-full" />

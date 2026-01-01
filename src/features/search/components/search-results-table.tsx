@@ -18,6 +18,7 @@ import { TruncatedText } from "@/components/ui/truncated-text";
 import { formatDuration, parseDuration } from "@/lib/utils/time-formatters";
 import { PATH_BUILDERS } from "@/lib/constants";
 import Link from "next/link";
+import { EntityPagination } from "@/components/entity-pagination";
 
 type Clipper = {
   id: string;
@@ -49,11 +50,17 @@ type Pagination = {
 type SearchResultsTableProps = {
   videos: Video[];
   pagination: Pagination;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (pageSize: number) => void;
+  disabled?: boolean;
 };
 
 export const SearchResultsTable = ({
   videos,
   pagination,
+  onPageChange,
+  onPageSizeChange,
+  disabled = false,
 }: SearchResultsTableProps) => {
   if (videos.length === 0) {
     return (
@@ -183,9 +190,17 @@ export const SearchResultsTable = ({
         </TableBody>
       </Table>
 
-      <div className="text-sm text-muted-foreground">
-        Showing {videos.length} of {pagination.total} videos
-      </div>
+      <EntityPagination
+        page={pagination.page}
+        pageSize={pagination.pageSize}
+        totalCount={pagination.total}
+        totalPages={pagination.totalPages}
+        hasNextPage={pagination.page < pagination.totalPages}
+        hasPreviousPage={pagination.page > 1}
+        disabled={disabled}
+        onPageChange={onPageChange}
+        onPageSizeChange={onPageSizeChange}
+      />
     </div>
   );
 };

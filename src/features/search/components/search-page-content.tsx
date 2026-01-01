@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useSuspenseSearch } from "../hooks/use-search";
+import { useState, useTransition } from "react";
+import { useSuspenseSearch, useSearchParams } from "../hooks/use-search";
 import { FacetedSearchPanel } from "./faceted-search-panel";
 import { SearchResultsTable } from "./search-results-table";
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,9 @@ import { Filter } from "lucide-react";
 
 export const SearchPageContent = () => {
   const { data } = useSuspenseSearch();
+  const [params, setParams] = useSearchParams();
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [isPendingTransition, startTransition] = useTransition();
 
   // Calculate active filter count for mobile button badge
   const activeFilterCount =
@@ -57,7 +59,7 @@ export const SearchPageContent = () => {
               )}
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-[300px] overflow-y-auto">
+          <SheetContent side="left" className="w-75 overflow-y-auto">
             <SheetHeader>
               <SheetTitle>Filters</SheetTitle>
             </SheetHeader>
@@ -79,6 +81,9 @@ export const SearchPageContent = () => {
         <SearchResultsTable
           videos={data.videos}
           pagination={data.pagination}
+          onPageChange={(page) => setParams({ page })}
+          onPageSizeChange={(pageSize) => setParams({ pageSize, page: 1 })}
+          disabled={isPendingTransition}
         />
       </main>
     </div>
